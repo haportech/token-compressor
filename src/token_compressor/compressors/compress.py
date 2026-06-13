@@ -3,6 +3,7 @@ from .truncate import smart_truncate
 from .deduplicate import deduplicate
 from .structure import compress_json
 from ..token_counter import count_tokens
+from ..stats import log_stats
 
 
 def compress(
@@ -29,20 +30,29 @@ def compress(
     if not text:
         return text
 
+    input_tok = count_tokens(text)
+
     if strategy == "truncate":
-        return smart_truncate(text, target_tokens)
-
-    if strategy == "deduplicate":
-        return deduplicate(text)
-
-    if strategy == "json":
-        return compress_json(text, strip_keys=strip_keys)
-
-    if strategy == "auto":
-        # Dedup first (cheap), then truncate if still over target
+        result = smart_truncate(text, target_tokens)
+    elif strategy == "deduplicate":
+        result = deduplicate(text)
+    elif strategy == "json":
+        result = compress_json(text, strip_keys=strip_keys)
+    elif strategy == "auto":
         deduped = deduplicate(text)
         if count_tokens(deduped) > target_tokens:
-            return smart_truncate(deduped, target_tokens)
-        return deduped
+            result = smart_truncate(deduped, target_tokens)
+        else:
+            result = deduped
+    else:
+        result = text  # unknown strategy → passthrough
 
-    return text  # unknown strategy → passthrough
+    output_tok = count_tokens(result)
+    source = text[:80]
+    log_stats.record(
+        input_tokens=input_tok,
+        output_tokens=output_tok,
+        strategy=strategy,
+        source=source,
+    )
+    return result

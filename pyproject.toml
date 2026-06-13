@@ -1,15 +1,20 @@
 [project]
 name = "token-compressor"
 version = "0.1.0"
-description = "MCP server for token-aware text compression"
+description = "MCP server for token-aware text compression with live savings dashboard"
 requires-python = ">=3.12"
 dependencies = [
     "mcp>=1.0.0",
     "tiktoken>=0.7.0",
+    "rich>=13.0.0",
 ]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0"]
 
 [project.scripts]
 token-compressor = "token_compressor.server:main"
+token-dashboard = "token_compressor.dashboard:main"
 
 [build-system]
 requires = ["hatchling"]

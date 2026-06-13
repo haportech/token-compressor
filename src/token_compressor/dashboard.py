@@ -82,26 +82,28 @@ def render(entries):
 
     # Recent compressions table
     table = Table(title="Recent Compressions", border_style="bright_black")
-    table.add_column("#", style="dim", width=4)
-    table.add_column("Time", style="cyan", width=10)
-    table.add_column("Strategy", style="magenta", width=12)
-    table.add_column("In", justify="right", style="yellow")
-    table.add_column("Out", justify="right", style="green")
-    table.add_column("Saved", justify="right", style="bold green")
-    table.add_column("Pct", justify="right", style="cyan")
-    table.add_column("Source", style="dim", max_width=40, no_wrap=True)
+    table.add_column("#", style="dim", width=3)
+    table.add_column("Time", style="cyan", width=8)
+    table.add_column("Strat", style="magenta", width=8)
+    table.add_column("In", justify="right", style="yellow", width=7)
+    table.add_column("Out", justify="right", style="green", width=7)
+    table.add_column("Saved", justify="right", style="bold green", width=7)
+    table.add_column("%", justify="right", style="cyan", width=4)
+    table.add_column("Source", style="dim", max_width=35)
 
     for i, e in enumerate(entries[-10:], 1):
         ts = e["timestamp"][11:19] if "T" in e["timestamp"] else e["timestamp"][:8]
+        # Sanitize source: collapse whitespace, strip newlines
+        src = " ".join(e["source"].split())[:60]
         table.add_row(
             str(i),
             ts,
-            e["strategy"],
+            e["strategy"][:8],
             f"{e['input_tokens']:,}",
             f"{e['output_tokens']:,}",
             f"{e['saved_tokens']:,}",
             f"{e['savings_pct']:.0f}%",
-            e["source"],
+            src,
         )
 
     body["left"].update(Panel(table, border_style="bright_black"))

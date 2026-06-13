@@ -89,12 +89,12 @@ def render(entries):
     table.add_column("Out", justify="right", style="green", width=7)
     table.add_column("Saved", justify="right", style="bold green", width=7)
     table.add_column("%", justify="right", style="cyan", width=4)
-    table.add_column("Source", style="dim", max_width=35)
+    table.add_column("Source", style="dim", max_width=30, no_wrap=True)
 
     for i, e in enumerate(entries[-10:], 1):
         ts = e["timestamp"][11:19] if "T" in e["timestamp"] else e["timestamp"][:8]
-        # Sanitize source: collapse whitespace, strip newlines
-        src = " ".join(e["source"].split())[:60]
+        # Sanitize source: collapse whitespace, single line
+        src = " ".join(e["source"].split())[:50]
         table.add_row(
             str(i),
             ts,
